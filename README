@@ -8,6 +8,9 @@ Requirements
 ------------
 - awesome
 - naughty
+- libxslt
+- wget
+- /tmp dir
 
 Usage
 -----

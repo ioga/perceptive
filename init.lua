@@ -8,7 +8,7 @@ local last_weather_update_time = 0
 local weather = nil
 
 function dump_weather()
-    os.execute("wget 'http://www.google.com/ig/api?weather=Saint%20Petersburg%20RU&hl=en-gb' -O - -o /dev/null | xsltproc /home/ioga/awesome/style.xsl - | sed -e 's/^[ ^I]*//' -e 's/[ ^I]*$//' -e '/^$/d' > /tmp/.awesome.weather.new && mv /tmp/.awesome.weather.new /tmp/.awesome.weather &")
+    os.execute("wget 'http://www.google.com/ig/api?weather=Saint%20Petersburg%20RU&hl=en-gb' -O - -o /dev/null | xsltproc /home/ioga/awesome/perceptive/transform.xsl - | sed -e 's/^[ ^I]*//' -e 's/[ ^I]*$//' -e '/^$/d' > /tmp/.awesome.weather.new && mv /tmp/.awesome.weather.new /tmp/.awesome.weather &")
     last_weather_update_time = os.time()
 end
 
