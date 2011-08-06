@@ -17,6 +17,9 @@ Usage
 Copy perceptive dir into $XDG_CONFIG_HOME/awesome (awesome config dir).
 Then, add on top of rc.lua :
 
-require("perceptive")
+    require("perceptive")
 
-Coming soon...
+And bind perceptive notification to your default clock widget
+
+    perceptive.register(mytextclock)
+

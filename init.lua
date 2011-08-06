@@ -1,14 +1,18 @@
 local naughty = naughty
-local os = os
-local io = io
+local os = require("os")
+local io = require("io")
+local debug = require("debug")
 
 module('perceptive')
 
 local last_weather_update_time = 0
 local weather = nil
+local path_to_xsl = debug.getinfo(1, 'S').source:match[[^@(.*/).*$]] .. 'transform.xsl'
+local query = 'Saint%20Petersburg%20RU'
+local weather_cmd = "wget 'http://www.google.com/ig/api?weather=" .. query .. "&hl=en-gb' -O - -o /dev/null | xsltproc " .. path_to_xsl .." - | sed -e 's/^[ ^I]*//' -e 's/[ ^I]*$//' -e '/^$/d' > /tmp/.awesome.weather.new && mv /tmp/.awesome.weather.new /tmp/.awesome.weather &"
 
 function dump_weather()
-    os.execute("wget 'http://www.google.com/ig/api?weather=Saint%20Petersburg%20RU&hl=en-gb' -O - -o /dev/null | xsltproc /home/ioga/awesome/perceptive/transform.xsl - | sed -e 's/^[ ^I]*//' -e 's/[ ^I]*$//' -e '/^$/d' > /tmp/.awesome.weather.new && mv /tmp/.awesome.weather.new /tmp/.awesome.weather &")
+    os.execute(weather_cmd)
     last_weather_update_time = os.time()
 end
 
