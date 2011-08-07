@@ -1,50 +1,66 @@
 local naughty = naughty
+local timer = timer
 local os = require("os")
 local io = require("io")
 local debug = require("debug")
+local http = require("socket.http")
+local string = string
 
 module('perceptive')
 
-local last_weather_update_time = 0
-local weather = nil
 local path_to_xsl = debug.getinfo(1, 'S').source:match[[^@(.*/).*$]] .. 'transform.xsl'
+local xslt_cmd = 'xsltproc ' .. path_to_xsl .. ' - ' .. "| sed -e 's/^[ ^I]*//' -e 's/[ ^I]*$//' -e '/^$/d'"
 local query = 'Saint%20Petersburg%20RU'
-local weather_cmd = "wget 'http://www.google.com/ig/api?weather=" .. query .. "&hl=en-gb' -O - -o /dev/null | xsltproc " .. path_to_xsl .." - | sed -e 's/^[ ^I]*//' -e 's/[ ^I]*$//' -e '/^$/d' > /tmp/.awesome.weather.new && mv /tmp/.awesome.weather.new /tmp/.awesome.weather &"
+local weather_data = ""
+local weather = nil
+
+-- This was taken from http://www.lua.org/pil/20.3.html
+function escape(s)
+    s = string.gsub(s, "([&=+%c])", function (c)
+        return string.format("%%%02X", string.byte(c))
+    end)
+    s = string.gsub(s, " ", "+")
+    return s
+end
 
 function dump_weather()
-    os.execute(weather_cmd)
+    local url = 'http://www.google.com/ig/api?weather=' ..  query .. '&hl=en-gb'
+    local data = http.request(url)
+    fp = io.popen(xslt_cmd .. ">/tmp/.awesome.weather", "w")
+    fp:write(data)
+    fp:close()
+    io.input("/tmp/.awesome.weather")
+    weather_data = io.read("*all")
     last_weather_update_time = os.time()
 end
 
-function get_weather()
-    io.input('/tmp/.awesome.weather')
-    local ret = io.read("*all")
-    return ret
-end
-
-function remove_weather()
+function remove_notification()
     if weather ~= nil then
         naughty.destroy(weather)
         weather = nil
     end
 end
 
-function show_weather()
-    remove_weather()
-    local wtext = get_weather()
+function show_notification()
+    remove_notification()
     weather = naughty.notify({
-        text = wtext,
-        timeout = 3,
-        hover_timeout = 0.2
+        text = weather_data,
     })
 end
 
-function register(wid, url)
+function register(wid, q)
+    query = escape(q)
+    update_timer = timer({ timeout = 600 })
+    update_timer:add_signal("timeout", function() 
+        dump_weather()
+    end)
+    update_timer:start()
     dump_weather()
+
     wid:add_signal("mouse::enter", function()
-        show_weather()
-        if (os.time() - last_weather_update_time) > 600 then
-            dump_weather()
-        end
+        show_notification()
+    end)
+    wid:add_signal("mouse::leave", function()
+        remove_notification()
     end)
 end

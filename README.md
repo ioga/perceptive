@@ -6,20 +6,20 @@ weather notification via naughty lib.
 
 Requirements
 ------------
-- awesome
-- naughty
+- awesome 3.4+
+- LuaSocket library (luasocket package at Gentoo, Debian & Ubuntu, lua-socket at RHEL/CentOs/Fedora)
 - libxslt
-- wget
-- /tmp dir
+- /tmp directory
 
 Usage
 -----
-Copy perceptive dir into $XDG_CONFIG_HOME/awesome (awesome config dir).
+Clone perceptive repository into your $XDG_CONFIG_HOME/awesome (awesome config dir).
 Then, add on top of rc.lua :
 
     require("perceptive")
 
-And bind perceptive notification to your default clock widget
+And bind perceptive notification to some widget, for example, for your default clock widget:
 
-    perceptive.register(mytextclock)
+    perceptive.register(widget, query)
+    perceptive.register(mytextclock, 'Saint Petersburg Russia)
 
