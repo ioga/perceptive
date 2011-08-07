@@ -5,6 +5,7 @@ local io = require("io")
 local debug = require("debug")
 local http = require("socket.http")
 local string = string
+local print = print
 
 module('perceptive')
 
@@ -24,8 +25,12 @@ function escape(s)
 end
 
 function dump_weather()
-    local url = 'http://www.google.com/ig/api?weather=' ..  query .. '&hl=en-gb'
-    local data = http.request(url)
+    url = 'http://www.google.com/ig/api?weather=' ..  query .. '&hl=en-gb'
+    data, msg = http.request(url)
+    if not data then 
+        print("perceptive:http.request error:" .. msg)
+        return 
+    end
     fp = io.popen(xslt_cmd .. ">/tmp/.awesome.weather", "w")
     fp:write(data)
     fp:close()
