@@ -18,8 +18,8 @@ Then, add on top of rc.lua :
 
     require("perceptive")
 
-And bind perceptive notification to some widget, for example, for your default clock widget:
+And bind perceptive notification to some widget with parameters (widget object, query string), for example, for your default clock widget:
 
-    perceptive.register(widget, query)
-    perceptive.register(mytextclock, 'Saint Petersburg Russia)
+    perceptive.register(mytextclock, 'Saint Petersburg Russia')
 
+So, current weather and three days forecast for Saint Petersburg would be shown when you'll place your mouse over clock widget.
