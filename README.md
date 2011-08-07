@@ -23,3 +23,7 @@ And bind perceptive notification to some widget with parameters (widget object, 
     perceptive.register(mytextclock, 'Saint Petersburg Russia')
 
 So, current weather and three days forecast for Saint Petersburg would be shown when you'll place your mouse over clock widget.
+
+Screenshot
+-----
+https://github.com/ioga/perceptive/blob/master/screenshot.png
