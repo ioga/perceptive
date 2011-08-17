@@ -26,4 +26,6 @@ So, current weather and three days forecast for Saint Petersburg would be shown 
 
 Screenshot
 -----
-https://github.com/ioga/perceptive/blob/master/screenshot.png
+![Screenshot][1]
+
+[1]: http://github.com/ioga/perceptive/raw/master/screenshot.png
