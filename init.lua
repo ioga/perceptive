@@ -10,10 +10,12 @@ local print = print
 module('perceptive')
 
 local path_to_xsl = debug.getinfo(1, 'S').source:match[[^@(.*/).*$]] .. 'transform.xsl'
-local xslt_cmd = 'xsltproc ' .. path_to_xsl .. ' - ' .. "| sed -e 's/^[ ^I]*//' -e 's/[ ^I]*$//' -e '/^$/d'"
+local xslt_cmd = 'xsltproc ' .. path_to_xsl .. ' -'
 local query = 'Saint%20Petersburg%20RU'
+local tmpfile = '/tmp/.awesome.weather'
 local weather_data = ""
 local weather = nil
+local pattern = '%a.+'
 
 -- This was taken from http://www.lua.org/pil/20.3.html
 function escape(s)
@@ -31,11 +33,18 @@ function dump_weather()
         print("perceptive:http.request error:" .. msg)
         return 
     end
-    fp = io.popen(xslt_cmd .. ">/tmp/.awesome.weather", "w")
+    fp = io.popen(xslt_cmd .. '>' .. tmpfile, "w")
     fp:write(data)
     fp:close()
-    io.input("/tmp/.awesome.weather")
-    weather_data = io.read("*all")
+    io.input(tmpfile)
+    weather_data = ''
+    for line in io.lines() do
+        found = string.find(line, pattern)
+        if found ~= nil then
+            weather_data = weather_data .. string.sub(line, found) .. '\n'
+        end
+    end
+    weather_data = string.gsub(weather_data, "[\n]$", "")
     last_weather_update_time = os.time()
 end
 
