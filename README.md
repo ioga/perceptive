@@ -4,6 +4,9 @@ Perceptive, a weather notification module for awesome
 Perceptive is a module for awesome wm for brief and compact
 weather notification via naughty lib.
 
+Unfortunately, Google Weather API have been discontinued so at the moment this module is not functional.
+---
+
 Requirements
 ------------
 - awesome 3.4+
