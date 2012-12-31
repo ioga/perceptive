@@ -2,17 +2,13 @@ Perceptive, a weather notification module for awesome
 ================================
 
 Perceptive is a module for awesome wm for brief and compact
-weather notification via naughty lib.
-
-Unfortunately, Google Weather API have been discontinued so at the moment this module is not functional.
----
+weather notification via naughty lib and Yahoo! Weather API.
 
 Requirements
 ------------
-- awesome 3.4+
-- LuaSocket library (luasocket package at Gentoo, Debian & Ubuntu, lua-socket at RHEL/CentOs/Fedora)
-- libxslt
-- /tmp directory
+- awesome 3.4 (awesome 3.5 is not supported yet)
+- /tmp directory (I'll store a temporary file over there.)
+- python 2.7
 
 Usage
 -----
@@ -21,11 +17,14 @@ Then, add on top of rc.lua :
 
     require("perceptive")
 
-And bind perceptive notification to some widget with parameters (widget object, query string), for example, for your default clock widget:
+Bind perceptive notification to some widget:
 
-    perceptive.register(mytextclock, 'Saint Petersburg Russia')
+    perceptive.register(mytextclock, 2123260)
 
-So, current weather and three days forecast for Saint Petersburg would be shown when you'll place your mouse over clock widget.
+Where the second argument is so-called WOEID code of your city.
+To obtain it you can google 'yahoo weather %CITYNAME%' and follow the first link.
+It will look like http://weather.yahoo.com/united-states/california/san-diego-2487889/
+and the last number in that link will be the ID you need.
 
 Screenshot
 -----
@@ -35,7 +34,7 @@ Screenshot
 
 License
 -----
-Copyright (C) 2011-2012 Ilia Glazkov.
+Copyright (C) 2011-2013 Ilia Glazkov.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 

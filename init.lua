@@ -1,80 +1,83 @@
+-- Perceptive, a weather notification module for Awesome WM.
+--
+-- Author: Ilia Glazkov
+
 local naughty = naughty
 local timer = timer
-local os = require("os")
 local io = require("io")
 local debug = require("debug")
-local http = require("socket.http")
 local string = string
 local print = print
 
 module('perceptive')
 
-local path_to_xsl = debug.getinfo(1, 'S').source:match[[^@(.*/).*$]] .. 'transform.xsl'
-local xslt_cmd = 'xsltproc ' .. path_to_xsl .. ' -'
-local query = 'Saint%20Petersburg%20RU'
+local project_path = debug.getinfo(1, 'S').source:match[[^@(.*/).*$]]
+local script_path = project_path .. 'weather-fetcher.py'
+local script_cmd = script_path .. ' --id='
 local tmpfile = '/tmp/.awesome.weather'
 local weather_data = ""
-local weather = nil
+local notification = nil
 local pattern = '%a.+'
+local city_id = nil
 
--- This was taken from http://www.lua.org/pil/20.3.html
-function escape(s)
-    s = string.gsub(s, "([&=+%c])", function (c)
-        return string.format("%%%02X", string.byte(c))
+
+function execute(cmd, output, callback)
+    -- Executes command line, writes its output to temporary file, and
+    -- runs the callback with output as an argument.
+    local cmdline = cmd .. " &> " .. output .. " & "
+    io.popen(cmdline):close()
+
+    local execute_timer = timer({ timeout = 7 })
+    execute_timer:add_signal("timeout", function()
+        execute_timer:stop()
+        local f = io.open(output)
+        callback(f:read("*all"))
+        f:close()
     end)
-    s = string.gsub(s, " ", "+")
-    return s
+    execute_timer:start()
 end
 
-function dump_weather()
-    url = 'http://www.google.com/ig/api?weather=' ..  query .. '&hl=en-gb'
-    data, msg = http.request(url)
-    if not data then 
-        print("perceptive:http.request error:" .. msg)
-        return 
-    end
-    fp = io.popen(xslt_cmd .. '>' .. tmpfile, "w")
-    fp:write(data)
-    fp:close()
-    io.input(tmpfile)
-    weather_data = ''
-    for line in io.lines() do
-        found = string.find(line, pattern)
-        if found ~= nil then
-            weather_data = weather_data .. string.sub(line, found) .. '\n'
+
+function fetch_weather()
+    execute(script_cmd .. city_id, tmpfile, function(text)
+        old_weather_data = weather_data
+        weather_data = string.gsub(text, "[\n]$", "")
+        if notification ~= nil and old_weather_data ~= weather_data then
+            show_notification()
         end
-    end
-    weather_data = string.gsub(weather_data, "[\n]$", "")
-    last_weather_update_time = os.time()
+    end)
 end
+
 
 function remove_notification()
-    if weather ~= nil then
-        naughty.destroy(weather)
-        weather = nil
+    if notification ~= nil then
+        naughty.destroy(notification)
+        notification = nil
     end
 end
+
 
 function show_notification()
     remove_notification()
-    weather = naughty.notify({
+    notification = naughty.notify({
         text = weather_data,
     })
 end
 
-function register(wid, q)
-    query = escape(q)
+
+function register(widget, id)
+    city_id = id
     update_timer = timer({ timeout = 600 })
-    update_timer:add_signal("timeout", function() 
-        dump_weather()
+    update_timer:add_signal("timeout", function()
+        fetch_weather()
     end)
     update_timer:start()
-    dump_weather()
+    fetch_weather()
 
-    wid:add_signal("mouse::enter", function()
+    widget:add_signal("mouse::enter", function()
         show_notification()
     end)
-    wid:add_signal("mouse::leave", function()
+    widget:add_signal("mouse::leave", function()
         remove_notification()
     end)
 end
