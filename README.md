@@ -6,16 +6,16 @@ weather notification via naughty lib and Yahoo! Weather API.
 
 Requirements
 ------------
-- awesome 3.4 (awesome 3.5 is not supported yet)
+- awesome 3.5
 - /tmp directory (I'll store a temporary file over there.)
 - python 2.7
 
 Usage
 -----
 Clone perceptive repository into your $XDG_CONFIG_HOME/awesome (awesome config dir).
-Then, add on top of rc.lua :
+Then add on top of rc.lua :
 
-    require("perceptive")
+    local perceptive = require("perceptive")
 
 Bind perceptive notification to some widget:
 

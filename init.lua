@@ -2,7 +2,7 @@
 --
 -- Author: Ilia Glazkov
 
-local naughty = naughty
+local naughty = require("naughty")
 local timer = timer
 local io = require("io")
 local debug = require("debug")
@@ -28,7 +28,7 @@ function execute(cmd, output, callback)
     io.popen(cmdline):close()
 
     local execute_timer = timer({ timeout = 7 })
-    execute_timer:add_signal("timeout", function()
+    execute_timer:connect_signal("timeout", function()
         execute_timer:stop()
         local f = io.open(output)
         callback(f:read("*all"))
@@ -68,16 +68,16 @@ end
 function register(widget, id)
     city_id = id
     update_timer = timer({ timeout = 600 })
-    update_timer:add_signal("timeout", function()
+    update_timer:connect_signal("timeout", function()
         fetch_weather()
     end)
     update_timer:start()
     fetch_weather()
 
-    widget:add_signal("mouse::enter", function()
+    widget:connect_signal("mouse::enter", function()
         show_notification()
     end)
-    widget:add_signal("mouse::leave", function()
+    widget:connect_signal("mouse::leave", function()
         remove_notification()
     end)
 end
